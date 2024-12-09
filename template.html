@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<!-- auth0:head starts head -->
+
+	{%- auth0:head -%}
+
+	<!-- auth0:head ends head -->
+	<title>BanBif</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="icon" href="https://bancaempresa.dev.banbif.com.pe/favicon.ico" sizes="any" />
+	<link rel="icon" href="https://bancaempresa.dev.banbif.com.pe/favicon.svg" type="image/svg+xml" />
+	<link rel="apple-touch-icon" href="https://bancaempresa.dev.banbif.com.pe/apple-touch-icon.png" />
+	<link rel="manifest" href="https://bancaempresa.dev.banbif.com.pe/site.webmanifest" />
+	<link rel="stylesheet" href="https://bancaempresa.dev.banbif.com.pe/styles.css" />
+	<meta name="theme-color" content="#141925" />
+	<style>
+		@media (max-width: 600px) {
+
+			body,
+			html {
+				height: 100%;
+				background-color: #141925 !important;
+			}
+		}
+
+		.loader-login {
+			width: 80px;
+			height: 80px;
+			transform-origin: center;
+			animation: rotate4 2s linear infinite;
+		}
+
+		.loader-login .loader-circle {
+			fill: none;
+			stroke-width: 6px !important;
+			animation: dash4 1.5s ease-in-out infinite;
+		}
+
+		@keyframes rotate4 {
+			100% {
+				transform: rotate(360deg);
+			}
+		}
+
+		@keyframes dash4 {
+			0% {
+				stroke-dashoffset: 0;
+			}
+
+			50% {
+				stroke-dashoffset: -35px;
+			}
+
+			100% {
+				stroke-dashoffset: -125px;
+			}
+		}
+
+		#debug {
+			font-family: "Courier New", Courier, monospace;
+			font-size: small;
+			color: #5e5b5b;
+			position: absolute;
+			right: 0;
+		}
+	</style>
+
+	<style>
+		input#document-template:-webkit-autofill,
+		input#document-template:-moz-autofill,
+		input#document-template:autofill,
+		.input__control:autofill:hover,
+		.input__control:-webkit-autofill,
+		.input__control:-moz-autofill,
+		.input__control:autofill,
+		input:autofill,
+		input:autofill:hover {
+			background-color: rgba(255, 255, 255, .1) !important;
+			-webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, .1) inset !important;
+			transition: background-color 5000s ease-in-out 0s;
+		}
+
+		/* Firefox */
+		input#document-template:-moz-autofill {
+			background-color: rgba(255, 255, 255, .1) !important;
+			-webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, .1) inset !important;
+		}
+
+		/* Edge  */
+		input#document-template:-moz-autofill {
+			background-color: rgba(255, 255, 255, .1) !important;
+			-webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, .1) inset !important;
+
+		}
+
+		/* General  */
+		input#document-template {
+			background-color: rgba(255, 255, 255, .1) !important;
+		}
+
+
+
+
+		.input-login {
+			display: block;
+			position: relative;
+		}
+
+		.input-login.input--with-icon .input__control,
+		.input-login.input--with-icon .input__control__transfers {
+			padding-left: 40px;
+		}
+
+		.input-login.input--with-icon .input__placeholder {
+			left: 41px;
+		}
+
+		.widget-login {
+			display: none;
+		}
+
+		.input-login.error .input__control,
+		.input-login.error .input__control__transfers {
+			border-color: #ff6f8e;
+			outline-color: #ff6f8e
+		}
+
+		.input-login.error .input__control:focus,
+		.input-login.error .input__control__transfers:focus {
+			border-color: rgba(0, 0, 0, 0)
+		}
+
+		.input-login.error .input__placeholder {
+			color: #ff6f8e
+		}
+	</style>
+	<style>
+		.spinner {
+			border: 16px solid #f3f3f3;
+			border-top: 16px solid #3498db;
+			border-radius: 50%;
+			width: 120px;
+			height: 120px;
+			animation: spin 2s linear infinite;
+			display: none;
+			z-index: 9999;
+			/* Initially hidden */
+		}
+
+		@keyframes spin {
+			0% {
+				transform: rotate(0deg);
+			}
+
+			100% {
+				transform: rotate(360deg);
+			}
+		}
+
+		#hidden {
+			display: none;
+			/* Initially hidden */
+		}
+	</style>
+	<script>
+		// var environment = "https://bancaempresa.dev.banbif.com.pe/"
+		// var environment = "https://bancaempresa.dev.banbif.com.pe/"
+		var environment = "http://localhost:4200/"
+		function toggleStyleSheet(index) {
+
+			const styleSheet = document.styleSheets.item(index);
+			if (styleSheet) {
+				styleSheet.disabled = !styleSheet.disabled;
+			} else {
+				console.error(
+					"No se encontró una hoja de estilos en el índice proporcionado."
+				);
+			}
+		}
+	</script>
+</head>
+
+<body>
+	<div id="debug" class="widget-login">
+		Name: {{prompt.name}}<br />
+		Screen name: {{prompt.screen.name}}<br />
+		RUC: {{transaction.params.ext-ruc}}<br />
+		<button type="button" class="btn btn-outline-primary btn-sm" onclick="toggleStyleSheet(0)">
+			Toggle sheet 0
+		</button>
+	</div>
+
+	{% if prompt.name == "login" %}
+	<div class="auth-layout">
+		<div class="auth-layout__head">
+			<a class="display-flex gap-spacing-xs align-items-start w-fit flex-direction-column" href="/">
+				<img src="https://bancaempresa.dev.banbif.com.pe/images/logo/banbif-branding-inverse.svg" alt="BanBif"
+					width="119px" height="32px" />
+				<span
+					class="font-text-md-regular w-full text-align-start font-weight-semibold color-neutral-light06">Empresas</span>
+			</a>
+		</div>
+		<div class="auth-layout__center-content">
+			<form class="width-100" autocomplete="off" novalidate>
+				<h1 class="text-align-center mb-spacing-xl font-title-lg-semibold">
+					Iniciar sesión
+				</h1>
+				<div class="mb-spacing-md">
+					<label class="input-login input--with-icon" for="ruc" id="label-ruc">
+						<span class="input__icon">
+							<svg width="1em" height="1em" viewBox="0 0 25 24" fill="none"
+								xmlns="http://www.w3.org/2000/svg">
+								<path
+									d="M6.66666 2C5.56209 2 4.66666 2.89543 4.66666 4V20C4.66666 21.1046 5.56209 22 6.66666 22H18.6667C19.7713 22 20.6667 21.1046 20.6667 20V9.82777C20.6667 9.29733 20.456 8.78863 20.0809 8.41355L14.2531 2.58579C13.8781 2.21071 13.3694 2 12.8389 2H6.66666ZM6.16666 4C6.16666 3.72386 6.39052 3.5 6.66666 3.5H12.6667V8C12.6667 9.10457 13.5621 10 14.6667 10H19.1667V20C19.1667 20.2761 18.9428 20.5 18.6667 20.5H6.66666C6.39052 20.5 6.16666 20.2761 6.16666 20V4ZM18.046 8.5H14.6667C14.3906 8.5 14.1667 8.27614 14.1667 8V4.62066L18.046 8.5Z"
+									fill="currentColor" />
+							</svg>
+						</span>
+						<input class="input__control" id="ruc-template" type="text" placeholder=" " autocomplete="off"
+							required />
+						<span class="input__placeholder">RUC</span>
+						<div class="input__helper-text error display-none" id="ruc-span-error">
+							<span class="icon">
+								<svg width="1em" height="1em" viewBox="0 0 64 64" fill="none"
+									xmlns="http://www.w3.org/2000/svg">
+									<path
+										d="M32 5.3335C46.728 5.3335 58.6667 17.2748 58.6667 32.0002C58.6667 46.7255 46.728 58.6668 32 58.6668C17.272 58.6668 5.33337 46.7255 5.33337 32.0002C5.33337 17.2748 17.272 5.3335 32 5.3335ZM32 9.77883C19.7467 9.77883 9.77871 19.7468 9.77871 32.0002C9.77871 44.2535 19.7467 54.2215 32 54.2215C44.2534 54.2215 54.2214 44.2535 54.2214 32.0002C54.2214 19.7468 44.2534 9.77883 32 9.77883ZM31.9966 38.6727C33.4672 38.6727 34.6595 39.8652 34.6595 41.3359C34.6595 42.8066 33.4672 43.9991 31.9966 43.9991C30.5256 43.9991 29.3334 42.8066 29.3334 41.3359C29.3334 39.8652 30.5256 38.6727 31.9966 38.6727ZM31.9854 18.6668C32.9979 18.666 33.8352 19.4178 33.9683 20.3939L33.987 20.6652L33.9966 32.6695C33.9974 33.774 33.1027 34.6703 31.9982 34.6711C30.9856 34.6719 30.148 33.9202 30.015 32.9442L29.9966 32.6727L29.987 20.6684C29.9859 19.5639 30.8806 18.6677 31.9854 18.6668Z"
+										fill="currentColor" />
+								</svg> </span>El número ingresado no es correcto.
+						</div>
+					</label>
+				</div>
+
+				<label class="input-login input--with-icon" for="document" id="label-document">
+					<span class="input__icon">
+						<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none"
+							xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M17.7545 14.0002C18.9966 14.0002 20.0034 15.007 20.0034 16.2491V16.8245C20.0034 17.7188 19.6838 18.5836 19.1023 19.263C17.5329 21.0965 15.1457 22.0013 12.0004 22.0013C8.8545 22.0013 6.46849 21.0962 4.90219 19.2619C4.32242 18.583 4.00391 17.7195 4.00391 16.8267V16.2491C4.00391 15.007 5.01076 14.0002 6.25278 14.0002H17.7545ZM17.7545 15.5002H6.25278C5.83919 15.5002 5.50391 15.8355 5.50391 16.2491V16.8267C5.50391 17.3624 5.69502 17.8805 6.04287 18.2878C7.29618 19.7555 9.26206 20.5013 12.0004 20.5013C14.7387 20.5013 16.7063 19.7555 17.9627 18.2876C18.3117 17.8799 18.5034 17.361 18.5034 16.8245V16.2491C18.5034 15.8355 18.1681 15.5002 17.7545 15.5002ZM12.0004 2.00488C14.7618 2.00488 17.0004 4.24346 17.0004 7.00488C17.0004 9.76631 14.7618 12.0049 12.0004 12.0049C9.23894 12.0049 7.00036 9.76631 7.00036 7.00488C7.00036 4.24346 9.23894 2.00488 12.0004 2.00488ZM12.0004 3.50488C10.0674 3.50488 8.50036 5.07189 8.50036 7.00488C8.50036 8.93788 10.0674 10.5049 12.0004 10.5049C13.9334 10.5049 15.5004 8.93788 15.5004 7.00488C15.5004 5.07189 13.9334 3.50488 12.0004 3.50488Z"
+								fill="currentColor" />
+						</svg>
+					</span>
+					<input class="input__control error" id="document-template" type="text" placeholder=" "
+						autocomplete="off" required />
+					<span class="input__placeholder">Documento de identidad</span>
+					<div class="input__helper-text error display-none" id="document-span-error">
+						<span class="icon">
+							<svg width="1em" height="1em" viewBox="0 0 64 64" fill="none"
+								xmlns="http://www.w3.org/2000/svg">
+								<path
+									d="M32 5.3335C46.728 5.3335 58.6667 17.2748 58.6667 32.0002C58.6667 46.7255 46.728 58.6668 32 58.6668C17.272 58.6668 5.33337 46.7255 5.33337 32.0002C5.33337 17.2748 17.272 5.3335 32 5.3335ZM32 9.77883C19.7467 9.77883 9.77871 19.7468 9.77871 32.0002C9.77871 44.2535 19.7467 54.2215 32 54.2215C44.2534 54.2215 54.2214 44.2535 54.2214 32.0002C54.2214 19.7468 44.2534 9.77883 32 9.77883ZM31.9966 38.6727C33.4672 38.6727 34.6595 39.8652 34.6595 41.3359C34.6595 42.8066 33.4672 43.9991 31.9966 43.9991C30.5256 43.9991 29.3334 42.8066 29.3334 41.3359C29.3334 39.8652 30.5256 38.6727 31.9966 38.6727ZM31.9854 18.6668C32.9979 18.666 33.8352 19.4178 33.9683 20.3939L33.987 20.6652L33.9966 32.6695C33.9974 33.774 33.1027 34.6703 31.9982 34.6711C30.9856 34.6719 30.148 33.9202 30.015 32.9442L29.9966 32.6727L29.987 20.6684C29.9859 19.5639 30.8806 18.6677 31.9854 18.6668Z"
+									fill="currentColor" />
+							</svg> </span>El número ingresado no es correcto.
+					</div>
+				</label>
+
+				<div class="mt-spacing-md mb-spacing-lg">
+					<div class="checkbox-with-label">
+						<div class="checkbox">
+							<input class="checkbox__input" type="checkbox" id="cb-doc" />
+							<label class="checkbox__control" for="cb-doc">
+								<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+									<path
+										d="M9 16.17L5.53 12.7c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l4.18 4.18c.39.39 1.02.39 1.41 0L20.29 7.71c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0L9 16.17z"
+										fill="currentColor"></path>
+								</svg>
+							</label>
+						</div>
+						<label class="checkbox__content" for="cb-doc">
+							<span class="paragraph font-size-2xs">Recordar documento</span>
+						</label>
+					</div>
+				</div>
+
+				<label class="input-login input--with-icon" for="password" id="label-password">
+					<span class="input__icon">
+						<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none"
+							xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M12 15.5C12.8284 15.5 13.5 14.8284 13.5 14C13.5 13.1716 12.8284 12.5 12 12.5C11.1716 12.5 10.5 13.1716 10.5 14C10.5 14.8284 11.1716 15.5 12 15.5ZM8 6C8 3.79086 9.79086 2 12 2C14.2091 2 16 3.79086 16 6V7H16.75C18.5449 7 20 8.45507 20 10.25V17.75C20 19.5449 18.5449 21 16.75 21H7.25C5.45507 21 4 19.5449 4 17.75V10.25C4 8.45507 5.45507 7 7.25 7H8V6ZM12 3.5C10.6193 3.5 9.5 4.61929 9.5 6V7H14.5V6C14.5 4.61929 13.3807 3.5 12 3.5ZM7.25 8.5C6.2835 8.5 5.5 9.2835 5.5 10.25V17.75C5.5 18.7165 6.2835 19.5 7.25 19.5H16.75C17.7165 19.5 18.5 18.7165 18.5 17.75V10.25C18.5 9.2835 17.7165 8.5 16.75 8.5H7.25Z"
+								fill="currentColor" />
+						</svg>
+					</span>
+					<input class="input__control" id="password-template" type="password" placeholder=" " maxlength="20"
+						autocomplete="new-password" required />
+					<span class="input__placeholder">Clave digital</span>
+					<span class="input__icon password" id="password-toggle">
+						<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none"
+							xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M2.21967 2.21967C1.9534 2.48594 1.9292 2.9026 2.14705 3.19621L2.21967 3.28033L6.25424 7.3149C4.33225 8.66437 2.89577 10.6799 2.29888 13.0644C2.1983 13.4662 2.4425 13.8735 2.84431 13.9741C3.24613 14.0746 3.6534 13.8305 3.75399 13.4286C4.28346 11.3135 5.59112 9.53947 7.33416 8.39452L9.14379 10.2043C8.43628 10.9258 8 11.9143 8 13.0046C8 15.2138 9.79086 17.0046 12 17.0046C13.0904 17.0046 14.0788 16.5683 14.8004 15.8608L20.7197 21.7803C21.0126 22.0732 21.4874 22.0732 21.7803 21.7803C22.0466 21.5141 22.0708 21.0974 21.8529 20.8038L21.7803 20.7197L15.6668 14.6055L15.668 14.604L14.4679 13.4061L11.598 10.5368L11.6 10.536L8.71877 7.65782L8.72 7.656L7.58672 6.52549L3.28033 2.21967C2.98744 1.92678 2.51256 1.92678 2.21967 2.21967ZM10.2041 11.2655L13.7392 14.8006C13.2892 15.2364 12.6759 15.5046 12 15.5046C10.6193 15.5046 9.5 14.3853 9.5 13.0046C9.5 12.3287 9.76824 11.7154 10.2041 11.2655ZM12 5.5C10.9997 5.5 10.0291 5.64807 9.11109 5.925L10.3481 7.16119C10.8839 7.05532 11.4364 7 12 7C15.9231 7 19.3099 9.68026 20.2471 13.4332C20.3475 13.835 20.7546 14.0794 21.1565 13.9791C21.5584 13.8787 21.8028 13.4716 21.7024 13.0697C20.5994 8.65272 16.6155 5.5 12 5.5ZM12.1947 9.00928L15.996 12.81C15.8942 10.7531 14.2472 9.10764 12.1947 9.00928Z"
+								fill="currentColor" />
+						</svg>
+					</span>
+					<div class="input__helper-text error display-none" id="password-span-error">
+						<span class="icon">
+							<svg width="1em" height="1em" viewBox="0 0 64 64" fill="none"
+								xmlns="http://www.w3.org/2000/svg">
+								<path
+									d="M32 5.3335C46.728 5.3335 58.6667 17.2748 58.6667 32.0002C58.6667 46.7255 46.728 58.6668 32 58.6668C17.272 58.6668 5.33337 46.7255 5.33337 32.0002C5.33337 17.2748 17.272 5.3335 32 5.3335ZM32 9.77883C19.7467 9.77883 9.77871 19.7468 9.77871 32.0002C9.77871 44.2535 19.7467 54.2215 32 54.2215C44.2534 54.2215 54.2214 44.2535 54.2214 32.0002C54.2214 19.7468 44.2534 9.77883 32 9.77883ZM31.9966 38.6727C33.4672 38.6727 34.6595 39.8652 34.6595 41.3359C34.6595 42.8066 33.4672 43.9991 31.9966 43.9991C30.5256 43.9991 29.3334 42.8066 29.3334 41.3359C29.3334 39.8652 30.5256 38.6727 31.9966 38.6727ZM31.9854 18.6668C32.9979 18.666 33.8352 19.4178 33.9683 20.3939L33.987 20.6652L33.9966 32.6695C33.9974 33.774 33.1027 34.6703 31.9982 34.6711C30.9856 34.6719 30.148 33.9202 30.015 32.9442L29.9966 32.6727L29.987 20.6684C29.9859 19.5639 30.8806 18.6677 31.9854 18.6668Z"
+									fill="currentColor" />
+							</svg> </span>La clave digital ingresado no es correcto.
+					</div>
+				</label>
+
+				<div class="mt-spacing-md mb-spacing-2xl text-align-right">
+					<a href="https://bancaempresa.dev.banbif.com.pe/qr.html">Recuperar clave</a>
+				</div>
+
+				<button class="button button--variant-primary button--size-md button--fill-content" type="submit"
+					id="btn-submit" disabled>
+					Ingresar
+				</button>
+
+				<div class="mt-spacing-3xl text-align-center">
+					<a href="https://bancaempresa.dev.banbif.com.pe/qr.html">Registrarme en la banca digital</a>
+				</div>
+			</form>
+
+			<div class="modal" id="modal-auth-error">
+				<div class="modal__backdrop"></div>
+				<div class="modal__content">
+					<div class="text-align-center">
+						<div class="mb-spacing-xl color-feedback-error-light" id="modal-icon">
+
+						</div>
+						<h4 class="font-title-sm-bold mb-spacing-md" id="modal-title">
+
+						</h4>
+						<p class="font-text-lg-regular color-neutral-light02 mb-spacing-xl" id="modal-message">
+
+						</p>
+					</div>
+					<a id="close-modal-button"
+						class="button button--variant-primary button--size-md button--fill-content"
+						href="#">Entendido</a>
+				</div>
+			</div>
+
+			<div class="hidden loader-screen" id="loader">
+				<div class="text-align-center">
+					<div class="loader-login">
+						<svg width="100%" height="100%" viewBox="0 0 81 81" fill="none"
+							xmlns="http://www.w3.org/2000/svg">
+							<circle cx="40.5" cy="40.75" r="37" stroke="url(#paint0_linear_386_23694)" stroke-width="6"
+								stroke-linejoin="round" class="loader-circle" />
+							<defs>
+								<linearGradient id="paint0_linear_386_23694" x1="0.5" y1="40.75" x2="80.5" y2="40.75"
+									gradientUnits="userSpaceOnUse">
+									<stop stop-color="#20A6FF" />
+									<stop offset="1" stop-color="#925AF5" />
+								</linearGradient>
+							</defs>
+						</svg>
+					</div>
+
+					<p class="font-text-lg-bold mt-spacing-md color-neutral-light06">
+						Validando...
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="auth-layout__footer">
+			<p class="font-text-sm-regular color-neutral-light02">
+				© <span id="year"></span> BanBif - Todos los derechos reservados.
+			</p>
+			<p class="font-text-sm-regular color-neutral-light02">
+				Banco Interamericano de Finanzas S.A. - RUC 20101036813
+			</p>
+		</div>
+	</div>
+	<div class="widget-login">{%- auth0:widget -%}</div>
+	{% elsif prompt.screen.name == "mfa-otp-challenge"%}
+
+	<div class="loader-screen" id="loader">
+		<div class="display-flex flex-direction-column align-items-center">
+			<div class="loader-login">
+				<svg width="100%" height="100%" viewBox="0 0 81 81" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<circle cx="40.5" cy="40.75" r="37" stroke="url(#paint0_linear_386_23694)" stroke-width="6"
+						stroke-linejoin="round" class="loader-circle" />
+					<defs>
+						<linearGradient id="paint0_linear_386_23694" x1="0.5" y1="40.75" x2="80.5" y2="40.75"
+							gradientUnits="userSpaceOnUse">
+							<stop stop-color="#20A6FF" />
+							<stop offset="1" stop-color="#925AF5" />
+						</linearGradient>
+					</defs>
+				</svg>
+			</div>
+
+			<p class="font-text-lg-bold mt-spacing-md color-neutral-light06">
+				Validando token...
+			</p>
+		</div>
+	</div>
+
+
+	<div class="widget-login">{%- auth0:widget -%}</div>
+
+	<script>
+		const errorMessage = document.getElementById("error-element-code");
+
+		const origen = environment; //document.referrer;
+		const path = "{{transaction.params.ext-target}}";
+
+		if (errorMessage) {
+			window.location.href = `${origen}${path}?rpt=1`;
+		}
+
+	</script>
+	<script>
+		function delay(milliseconds) {
+			return new Promise((resolve) => setTimeout(resolve, milliseconds));
+		}
+
+		async function valida_OTP_enviado() {
+
+			await delay(1000);
+
+			let botonSubmit = document.querySelector("button[name='action']");
+			let incorrectCode = document.getElementById("error-element-code");
+			let otpInput = document.getElementById("code");
+			otpInput.value = "{{transaction.params.ext-otp}}";
+
+			if (!incorrectCode && otpInput.value != 0) {
+				botonSubmit.click();
+			}
+		}
+
+		valida_OTP_enviado();
+	</script>
+	{% elsif prompt.screen.name == "mfa-push-challenge-push"%}
+	<main class="main-container container flex-grow-1">
+		<div class="modal active" id="modal-auth-profile">
+			<div class="modal__content">
+				<div class="pt-spacing-xl"></div>
+				<div class=" modal__head text-align-center mt-spacing-3xl">
+					<img src="https://bancaempresa.dev.banbif.com.pe/images/messages/valida-ingreso.svg" alt="">
+				</div>
+				<h4 class="font-title-sm-semibold mb-spacing-xl text-align-center">
+					Valida tu ingreso
+				</h4>
+				<div class="row mb-spacing-2xl">
+					<div class="col font-text-md-regular color-neutral-light02 text-align-center">
+						<p>Hemos enviando una notificación a tu celular </p>
+						<p>registrado para que apruebes tu ingreso.</p>
+					</div>
+				</div>
+				<button
+					class="button button--variant-outlined button--size-md button--fill-content color-interaction-light02 "
+					style="outline: none; border: none;" type="submit" id="btn-submit-push">
+					<span class="font-text-md-regular">
+						Reenviar notificación
+					</span>
+				</button>
+			</div>
+		</div>
+	</main>
+	<div class="widget-login">{%- auth0:widget -%}</div>
+	<script>
+		window.addEventListener("load", function () {
+
+			let btn_submit = document.getElementById("btn-submit-push");
+			btn_submit.addEventListener("click", (event) => {
+				event.preventDefault();
+				let btn_submit_widwet = document.getElementsByName("action")[3];
+				btn_submit_widwet.click();
+			});
+
+		});
+	</script>
+
+	{% else %} {%- auth0:widget -%} {% endif %}
+
+	<script type="text/javascript">
+		const rucLabel = document.getElementById("label-ruc");
+		const rucInput = document.getElementById("ruc-template");
+		const rucError = document.getElementById("ruc-span-error");
+		const documentLabel = document.getElementById("label-document")
+		const documentInput = document.getElementById("document-template");
+		const documentError = document.getElementById("document-span-error");
+		const passwordInput = document.getElementById("password-template");
+		const togglePassword = document.getElementById("password-toggle");
+		const submitBtn = document.getElementById("btn-submit");
+
+		let rucValid = false;
+		let documentValid = false;
+		let passwordValid = false;
+
+		const forbiddenChars = ['<', '>', "'", '"', '=', ';', '(', ')', '{', '}', '[', ']', '`', '\\', '/'];
+		function preventForbiddenChars(event) {
+			if (forbiddenChars.includes(event.key)) {
+				event.preventDefault();
+			}
+		}
+
+		function sanitizeInputValue(inputElement) {
+			const forbiddenCharsRegex = /[<>'"=;(){}\[\]`\\\/]/g;
+			inputElement.value = inputElement.value.replace(forbiddenCharsRegex, '');
+		}
+
+		rucInput.addEventListener("keydown", function (event) {
+
+			// Teclas permitidas
+			const allowedKeys = [
+				"Backspace",
+				"Delete",
+				"Tab",
+				"ArrowLeft",
+				"ArrowRight",
+			];
+
+			// Combinaciones de teclas Ctrl o Cmd permitidas
+			const ctrlAllowedKeys = ["a", "c", "x", "v"];
+
+			// Permitir teclas de control y navegación
+			if (
+				(event.ctrlKey || event.metaKey) &&
+				ctrlAllowedKeys.includes(event.key.toLowerCase())
+			) {
+				return;
+			}
+
+			if (allowedKeys.includes(event.key)) {
+				return;
+			}
+
+			// Permitir solo letras y números
+			const isLetterOrNumber = /^[A-Z0-9]$/i.test(event.key);
+			if (!isLetterOrNumber) {
+				event.preventDefault();
+			}
+		});
+
+
+		rucInput.addEventListener("input", function () {
+			sanitizeInputValue(rucInput);
+			rucInput.value = rucInput.value.toUpperCase();
+			if (rucInput.value.length > 10) {
+				rucValid = true;
+				rucLabel.classList.remove("error")
+				rucError.classList.add("display-none");
+				rucInput.classList.remove("input__control--error");
+				enableSubmitButton();
+			}
+		});
+
+		rucInput.addEventListener("paste", function (event) {
+			event.preventDefault();
+			let pasteData = (event.clipboardData || window.clipboardData).getData('text').toUpperCase();
+			pasteData = pasteData.replace(/[<>'"=;(){}\[\]`\\\/]/g, '');
+			rucInput.value = pasteData;
+			rucValid = rucInput.value.length > 10;
+			enableSubmitButton();
+		});
+
+		rucInput.addEventListener("blur", () => {
+			const value = rucInput.value.trim();
+
+			if (value.startsWith('20')) {
+				if (value.length !== 11) {
+					rucLabel.classList.add("error")
+					rucError.classList.remove("display-none");
+					rucInput.classList.add("input__control--error");
+				} else {
+					rucLabel.classList.remove("error")
+					rucError.classList.add("display-none");
+					rucInput.classList.remove("input__control--error");
+				}
+			} else if (value.toUpperCase().startsWith('AUX')) {
+				if (value.length !== 12) {
+					rucLabel.classList.add("error")
+					rucError.classList.remove("display-none");
+					rucInput.classList.add("input__control--error");
+				} else {
+					rucLabel.classList.remove("error")
+					rucError.classList.add("display-none");
+					rucInput.classList.remove("input__control--error");
+				}
+			} else {
+				rucLabel.classList.add("error")
+				rucError.classList.remove("display-none");
+				rucInput.classList.add("input__control--error");
+			}
+		})
+
+		documentInput.addEventListener("keydown", function (event) {
+			const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight"];
+			const ctrlAllowedKeys = ["a", "c", "x", "v"];
+			let documentValue = documentInput.value;
+
+			if (
+				(event.ctrlKey || event.metaKey) &&
+				ctrlAllowedKeys.includes(event.key.toLowerCase())
+			) {
+				return;
+			}
+
+			if (allowedKeys.includes(event.key)) {
+				return;
+			}
+
+			if (!/[0-9]/.test(event.key)) {
+				event.preventDefault();
+			}
+		});
+
+		documentInput.addEventListener("input", function () {
+			sanitizeInputValue(documentInput);
+			if (documentInput.value.length > 7) {
+				documentValid = true;
+				documentLabel.classList.remove("error")
+				documentError.classList.add("display-none");
+				documentInput.classList.remove("input__control--error");
+				enableSubmitButton();
+			}
+		});
+
+		documentInput.addEventListener("paste", function (event) {
+			event.preventDefault();
+			let pasteData = (event.clipboardData || window.clipboardData).getData('text');
+			pasteData = pasteData.replace(/[<>'"=;(){}\[\]`\\\/]/g, '');
+			documentInput.value = pasteData;
+			documentValid = documentInput.value.length > 7;
+			enableSubmitButton();
+		});
+
+		documentInput.addEventListener("blur", () => {
+			const value = documentInput.value.trim();
+			if (!/^\d+$/.test(value) || value.length < 8 || value.length > 15) {
+				documentLabel.classList.add("error")
+				documentError.classList.remove("display-none");
+				documentInput.classList.add("input__control--error");
+			} else {
+				documentLabel.classList.remove("error")
+				documentError.classList.add("display-none");
+				documentInput.classList.remove("input__control--error");
+			}
+		})
+
+		passwordInput.addEventListener("keydown", preventForbiddenChars);
+
+		passwordInput.addEventListener("input", function () {
+			sanitizeInputValue(passwordInput);
+			const passwordValue = passwordInput.value;
+			passwordValid = passwordValue.length >= 8 && passwordValue.length <= 20;
+			enableSubmitButton();
+		});
+
+		passwordInput.addEventListener("paste", function (event) {
+			event.preventDefault();
+			let pasteData = (event.clipboardData || window.clipboardData).getData('text');
+			pasteData = pasteData.replace(/[<>'"=;(){}\[\]`\\\/]/g, '');
+			passwordInput.value = pasteData;
+			const passwordValue = passwordInput.value;
+			passwordValid = passwordValue.length >= 8 && passwordValue.length <= 20;
+			enableSubmitButton();
+		});
+
+		togglePassword.addEventListener("click", function () {
+			if (passwordInput.type === "password") {
+				passwordInput.type = "text";
+				togglePassword.innerHTML = `
+      <svg width="1em" height="1em" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M12.4999 9.00462C14.709 9.00462 16.4999 10.7955 16.4999 13.0046C16.4999 15.2138 14.709 17.0046 12.4999 17.0046C10.2907 17.0046 8.49987 15.2138 8.49987 13.0046C8.49987 10.7955 10.2907 9.00462 12.4999 9.00462ZM12.4999 5.5C17.1134 5.5 21.096 8.65001 22.201 13.0644C22.3016 13.4662 22.0574 13.8735 21.6556 13.9741C21.2537 14.0746 20.8465 13.8305 20.7459 13.4286C19.807 9.67796 16.4212 7 12.4999 7C8.57681 7 5.18997 9.68026 4.25273 13.4332C4.15237 13.835 3.74523 14.0794 3.34336 13.9791C2.94149 13.8787 2.69707 13.4716 2.79743 13.0697C3.90052 8.65272 7.88436 5.5 12.4999 5.5Z"
+					fill="currentColor" />
+				</svg>
+        `;
+			} else {
+				passwordInput.type = "password";
+				togglePassword.innerHTML = `
+        <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M2.21967 2.21967C1.9534 2.48594 1.9292 2.9026 2.14705 3.19621L2.21967 3.28033L6.25424 7.3149C4.33225 8.66437 2.89577 10.6799 2.29888 13.0644C2.1983 13.4662 2.4425 13.8735 2.84431 13.9741C3.24613 14.0746 3.6534 13.8305 3.75399 13.4286C4.28346 11.3135 5.59112 9.53947 7.33416 8.39452L9.14379 10.2043C8.43628 10.9258 8 11.9143 8 13.0046C8 15.2138 9.79086 17.0046 12 17.0046C13.0904 17.0046 14.0788 16.5683 14.8004 15.8608L20.7197 21.7803C21.0126 22.0732 21.4874 22.0732 21.7803 21.7803C22.0466 21.5141 22.0708 21.0974 21.8529 20.8038L21.7803 20.7197L15.6668 14.6055L15.668 14.604L14.4679 13.4061L11.598 10.5368L11.6 10.536L8.71877 7.65782L8.72 7.656L7.58672 6.52549L3.28033 2.21967C2.98744 1.92678 2.51256 1.92678 2.21967 2.21967ZM10.2041 11.2655L13.7392 14.8006C13.2892 15.2364 12.6759 15.5046 12 15.5046C10.6193 15.5046 9.5 14.3853 9.5 13.0046C9.5 12.3287 9.76824 11.7154 10.2041 11.2655ZM12 5.5C10.9997 5.5 10.0291 5.64807 9.11109 5.925L10.3481 7.16119C10.8839 7.05532 11.4364 7 12 7C15.9231 7 19.3099 9.68026 20.2471 13.4332C20.3475 13.835 20.7546 14.0794 21.1565 13.9791C21.5584 13.8787 21.8028 13.4716 21.7024 13.0697C20.5994 8.65272 16.6155 5.5 12 5.5ZM12.1947 9.00928L15.996 12.81C15.8942 10.7531 14.2472 9.10764 12.1947 9.00928Z" fill="currentColor" />
+				</svg>
+        `;
+			}
+		});
+
+		function enableSubmitButton() {
+			if (rucValid && documentValid && passwordValid) {
+				submitBtn.disabled = false;
+			} else {
+				submitBtn.disabled = true;
+			}
+		}
+
+		const closeButton = document.getElementById("close-modal-button");
+		document.getElementById("year").textContent = new Date().getFullYear();
+	</script>
+
+	<script>
+		window.addEventListener("load", function () {
+
+			let rucTemplate = document.getElementById("ruc-template");
+			let documentTemplate = document.getElementById("document-template");
+			let passwordTemplate = document.getElementById("password-template");
+			let btn_submit = document.getElementById("btn-submit");
+			var elem = document.getElementById("loader");
+			btn_submit.addEventListener("click", (event) => {
+				event.preventDefault();
+				elem.classList.remove("hidden");
+				let ruc_widget = document.getElementById("ruc");
+				ruc_widget.value = rucTemplate.value;
+
+				let username_widget = document.getElementById("username");
+				username_widget.value = `${rucTemplate.value}-${documentTemplate.value}`;
+
+				let password_widwet = document.getElementsByName("password")[0];
+				password_widwet.value = passwordTemplate.value;
+
+				let btn_submit_widwet = document.getElementsByName("action")[0];
+				btn_submit_widwet.click();
+
+
+			});
+			elem.classList.add("hidden");
+
+			let prompt_alert = document.getElementById("prompt-alert");
+			if (prompt_alert) {
+				let title = document.getElementById("modal-title");
+				let message = document.getElementById("modal-message");
+				let icons_modal = document.getElementById("modal-icon");
+				title.innerHTML = "Problemas de autenticación"
+				message.innerHTML = prompt_alert.innerHTML;
+				icons_modal.innerHTML = `<img src="https://bancaempresa.dev.banbif.com.pe/images/messages/problema-autenticacion.svg" alt="" />`;
+
+				const modal = document.getElementById("modal-auth-error");
+				modal.classList.add("active");
+			}
+
+			let error_code = document
+				.getElementById("error-element-password")
+				.textContent.trim();
+			let error_code_json = JSON.parse(error_code);
+
+
+			if (!!error_code_json) {
+				if (error_code_json.redirect_to) {
+					window.location.href = error_code_json.redirect_to;
+					return;
+				}
+
+				let title = document.getElementById("modal-title");
+				let message = document.getElementById("modal-message");
+				let icons_modal = document.getElementById("modal-icon");
+
+				title.innerHTML = error_code_json.title;
+				message.innerHTML = error_code_json.message;
+				icons_modal.innerHTML = `<img src="https://bancaempresa.dev.banbif.com.pe/images/messages/${error_code_json.icon}" alt="" />`;
+
+				const modal = document.getElementById("modal-auth-error");
+				modal.classList.add("active");
+			}
+
+			const span = document.getElementById("error-element-password");
+			span.textContent = "";
+		});
+
+		closeButton.addEventListener("click", function (event) {
+			event.preventDefault();
+
+			const modal = document.getElementById("modal-auth-error");
+			modal.classList.remove("active");
+		});
+	</script>
+</body>
+
+</html>

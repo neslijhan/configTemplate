@@ -1,0 +1,13 @@
+UAT
+AUTH0_DOMAIN = https://banbifpjuat.us.auth0.com
+CLIENT_ID = pPDmn1O31cWwoUkqGW6YLeCZqyyuBnFd
+CLIENT_SECRET = 0Dtt43Y1mLA5d0y6xKLfY0ADFvq3o4Y8Vv2LsJjtsCjSn6o4i7O44ytcx7s7x_eb
+
+
+dev 
+AUTH0_DOMAIN = https://banbifpj.us.auth0.com
+CLIENT_ID = 9KjlhsL4tn1hZMHDpK1xILosU9L5Wapx
+CLIENT_SECRET = EgN95IY-_mcagYXWIj8ytIQKUt1Q83za4qJg1TC2dgWCMD7E4K5z8AfnVnnXXc7L
+
+
+
