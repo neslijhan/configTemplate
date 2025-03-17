@@ -16,6 +16,11 @@
 	<link rel="manifest" href="https://bancaempresa.dev.banbif.com.pe/site.webmanifest" />
 	<link rel="stylesheet" href="https://bancaempresa.dev.banbif.com.pe/styles.css" />
 	<meta name="theme-color" content="#141925" />
+
+	<script>
+		let ref = document.referrer;
+	</script>
+
 	<style>
 		@media (max-width: 600px) {
 
@@ -27,8 +32,8 @@
 		}
 
 		.loader-login {
-			width: 80px;
-			height: 80px;
+			width: 77.5px;
+			height: 77.5px;
 			transform-origin: center;
 			animation: rotate4 2s linear infinite;
 		}
@@ -66,9 +71,7 @@
 			position: absolute;
 			right: 0;
 		}
-	</style>
 
-	<style>
 		input#document-template:-webkit-autofill,
 		input#document-template:-moz-autofill,
 		input#document-template:autofill,
@@ -80,29 +83,23 @@
 		input:autofill:hover {
 			background-color: rgba(255, 255, 255, .1) !important;
 			-webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, .1) inset !important;
+			box-shadow: 0 0 0 30px rgba(255, 255, 255, .1) inset !important;
 			transition: background-color 5000s ease-in-out 0s;
 		}
 
 		/* Firefox */
-		input#document-template:-moz-autofill {
-			background-color: rgba(255, 255, 255, .1) !important;
-			-webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, .1) inset !important;
-		}
-
 		/* Edge  */
 		input#document-template:-moz-autofill {
 			background-color: rgba(255, 255, 255, .1) !important;
 			-webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, .1) inset !important;
-
+			box-shadow: 0 0 0 30px rgba(255, 255, 255, .1) inset !important;
 		}
+
 
 		/* General  */
 		input#document-template {
 			background-color: rgba(255, 255, 255, .1) !important;
 		}
-
-
-
 
 		.input-login {
 			display: block;
@@ -136,8 +133,7 @@
 		.input-login.error .input__placeholder {
 			color: #ff6f8e
 		}
-	</style>
-	<style>
+
 		.spinner {
 			border: 16px solid #f3f3f3;
 			border-top: 16px solid #3498db;
@@ -165,22 +161,8 @@
 			/* Initially hidden */
 		}
 	</style>
-	<script>
-		// var environment = "https://bancaempresa.dev.banbif.com.pe/"
-		// var environment = "https://bancaempresa.dev.banbif.com.pe/"
-		var environment = "http://localhost:4200/"
-		function toggleStyleSheet(index) {
 
-			const styleSheet = document.styleSheets.item(index);
-			if (styleSheet) {
-				styleSheet.disabled = !styleSheet.disabled;
-			} else {
-				console.error(
-					"No se encontró una hoja de estilos en el índice proporcionado."
-				);
-			}
-		}
-	</script>
+
 </head>
 
 <body>
@@ -220,7 +202,7 @@
 						</span>
 						<input class="input__control" id="ruc-template" type="text" placeholder=" " autocomplete="off"
 							required />
-						<span class="input__placeholder">RUC</span>
+						<span class="input__placeholder">RUC o Entidad</span>
 						<div class="input__helper-text error display-none" id="ruc-span-error">
 							<span class="icon">
 								<svg width="1em" height="1em" viewBox="0 0 64 64" fill="none"
@@ -244,7 +226,7 @@
 					</span>
 					<input class="input__control error" id="document-template" type="text" placeholder=" "
 						autocomplete="off" required />
-					<span class="input__placeholder">Documento de identidad</span>
+					<span class="input__placeholder">Documento de identidad o usuario</span>
 					<div class="input__helper-text error display-none" id="document-span-error">
 						<span class="icon">
 							<svg width="1em" height="1em" viewBox="0 0 64 64" fill="none"
@@ -306,13 +288,17 @@
 				</label>
 
 				<div class="mt-spacing-md mb-spacing-2xl text-align-right">
-					<a href="https://bancaempresa.dev.banbif.com.pe/qr.html">Recuperar clave</a>
+					<a href="https://bancaporinternetuat.dombif.peru/DCIBS_REB_BIFNET/pages/s/recuperaclave.jsp?init=0 ">Recuperar clave</a>
 				</div>
 
 				<button class="button button--variant-primary button--size-md button--fill-content" type="submit"
 					id="btn-submit" disabled>
 					Ingresar
 				</button>
+
+				<div id="captcha">
+
+				</div>
 
 				<div class="mt-spacing-3xl text-align-center">
 					<a href="https://bancaempresa.dev.banbif.com.pe/qr.html">Registrarme en la banca digital</a>
@@ -339,7 +325,7 @@
 				</div>
 			</div>
 
-			<div class="hidden loader-screen" id="loader">
+			<div class="loader-screen" id="loader">
 				<div class="text-align-center">
 					<div class="loader-login">
 						<svg width="100%" height="100%" viewBox="0 0 81 81" fill="none"
@@ -373,7 +359,6 @@
 	</div>
 	<div class="widget-login">{%- auth0:widget -%}</div>
 	{% elsif prompt.screen.name == "mfa-otp-challenge"%}
-
 	<div class="loader-screen" id="loader">
 		<div class="display-flex flex-direction-column align-items-center">
 			<div class="loader-login">
@@ -389,7 +374,6 @@
 					</defs>
 				</svg>
 			</div>
-
 			<p class="font-text-lg-bold mt-spacing-md color-neutral-light06">
 				Validando token...
 			</p>
@@ -401,10 +385,9 @@
 
 	<script>
 		const errorMessage = document.getElementById("error-element-code");
-
-		const origen = environment; //document.referrer;
+		// const origen = "https://bancaempresa.dev.banbif.com.pe/";
+		const origen = "http://localhost:4200/";
 		const path = "{{transaction.params.ext-target}}";
-
 		if (errorMessage) {
 			window.location.href = `${origen}${path}?rpt=1`;
 		}
@@ -418,13 +401,12 @@
 		async function valida_OTP_enviado() {
 
 			await delay(1000);
-
 			let botonSubmit = document.querySelector("button[name='action']");
 			let incorrectCode = document.getElementById("error-element-code");
 			let otpInput = document.getElementById("code");
 			otpInput.value = "{{transaction.params.ext-otp}}";
 
-			if (!incorrectCode && otpInput.value != 0) {
+			if (!incorrectCode) {
 				botonSubmit.click();
 			}
 		}
@@ -474,7 +456,20 @@
 
 	{% else %} {%- auth0:widget -%} {% endif %}
 
-	<script type="text/javascript">
+	<script>
+		var environment = "http://localhost:4200/"
+
+		function toggleStyleSheet(index) {
+			const styleSheet = document.styleSheets.item(index);
+			if (styleSheet) {
+				styleSheet.disabled = !styleSheet.disabled;
+			} else {
+				console.error(
+					"No se encontró una hoja de estilos en el i­ndice proporcionado."
+				);
+			}
+		}
+
 		const rucLabel = document.getElementById("label-ruc");
 		const rucInput = document.getElementById("ruc-template");
 		const rucError = document.getElementById("ruc-span-error");
@@ -515,7 +510,7 @@
 			// Combinaciones de teclas Ctrl o Cmd permitidas
 			const ctrlAllowedKeys = ["a", "c", "x", "v"];
 
-			// Permitir teclas de control y navegación
+			// Permitir teclas de control y navegaciÃ³n
 			if (
 				(event.ctrlKey || event.metaKey) &&
 				ctrlAllowedKeys.includes(event.key.toLowerCase())
@@ -527,7 +522,7 @@
 				return;
 			}
 
-			// Permitir solo letras y números
+			// Permitir solo letras y nÃºmeros
 			const isLetterOrNumber = /^[A-Z0-9]$/i.test(event.key);
 			if (!isLetterOrNumber) {
 				event.preventDefault();
@@ -538,7 +533,7 @@
 		rucInput.addEventListener("input", function () {
 			sanitizeInputValue(rucInput);
 			rucInput.value = rucInput.value.toUpperCase();
-			if (rucInput.value.length > 10) {
+			if (rucInput.value.length > 5) {
 				rucValid = true;
 				rucLabel.classList.remove("error")
 				rucError.classList.add("display-none");
@@ -552,7 +547,7 @@
 			let pasteData = (event.clipboardData || window.clipboardData).getData('text').toUpperCase();
 			pasteData = pasteData.replace(/[<>'"=;(){}\[\]`\\\/]/g, '');
 			rucInput.value = pasteData;
-			rucValid = rucInput.value.length > 10;
+			rucValid = rucInput.value.length > 5;
 			enableSubmitButton();
 		});
 
@@ -580,9 +575,15 @@
 					rucInput.classList.remove("input__control--error");
 				}
 			} else {
-				rucLabel.classList.add("error")
-				rucError.classList.remove("display-none");
-				rucInput.classList.add("input__control--error");
+
+				if (value.length < 6) {
+
+					rucLabel.classList.add("error")
+					rucError.classList.remove("display-none");
+					rucInput.classList.add("input__control--error");
+
+				}
+
 			}
 		})
 
@@ -602,14 +603,14 @@
 				return;
 			}
 
-			if (!/[0-9]/.test(event.key)) {
-				event.preventDefault();
-			}
+			// if (!/[0-9]/.test(event.key)) {
+			// 	event.preventDefault();
+			// }
 		});
 
 		documentInput.addEventListener("input", function () {
 			sanitizeInputValue(documentInput);
-			if (documentInput.value.length > 7) {
+			if (documentInput.value.length > 5) {
 				documentValid = true;
 				documentLabel.classList.remove("error")
 				documentError.classList.add("display-none");
@@ -623,13 +624,13 @@
 			let pasteData = (event.clipboardData || window.clipboardData).getData('text');
 			pasteData = pasteData.replace(/[<>'"=;(){}\[\]`\\\/]/g, '');
 			documentInput.value = pasteData;
-			documentValid = documentInput.value.length > 7;
+			documentValid = documentInput.value.length > 5;
 			enableSubmitButton();
 		});
 
 		documentInput.addEventListener("blur", () => {
 			const value = documentInput.value.trim();
-			if (!/^\d+$/.test(value) || value.length < 8 || value.length > 15) {
+			if (value.length < 5 || value.length > 15) {
 				documentLabel.classList.add("error")
 				documentError.classList.remove("display-none");
 				documentInput.classList.add("input__control--error");
@@ -645,7 +646,7 @@
 		passwordInput.addEventListener("input", function () {
 			sanitizeInputValue(passwordInput);
 			const passwordValue = passwordInput.value;
-			passwordValid = passwordValue.length >= 8 && passwordValue.length <= 20;
+			passwordValid = passwordValue.length >= 6 && passwordValue.length <= 20;
 			enableSubmitButton();
 		});
 
@@ -655,7 +656,7 @@
 			pasteData = pasteData.replace(/[<>'"=;(){}\[\]`\\\/]/g, '');
 			passwordInput.value = pasteData;
 			const passwordValue = passwordInput.value;
-			passwordValid = passwordValue.length >= 8 && passwordValue.length <= 20;
+			passwordValid = passwordValue.length >= 6 && passwordValue.length <= 20;
 			enableSubmitButton();
 		});
 
@@ -663,18 +664,18 @@
 			if (passwordInput.type === "password") {
 				passwordInput.type = "text";
 				togglePassword.innerHTML = `
-      <svg width="1em" height="1em" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path d="M12.4999 9.00462C14.709 9.00462 16.4999 10.7955 16.4999 13.0046C16.4999 15.2138 14.709 17.0046 12.4999 17.0046C10.2907 17.0046 8.49987 15.2138 8.49987 13.0046C8.49987 10.7955 10.2907 9.00462 12.4999 9.00462ZM12.4999 5.5C17.1134 5.5 21.096 8.65001 22.201 13.0644C22.3016 13.4662 22.0574 13.8735 21.6556 13.9741C21.2537 14.0746 20.8465 13.8305 20.7459 13.4286C19.807 9.67796 16.4212 7 12.4999 7C8.57681 7 5.18997 9.68026 4.25273 13.4332C4.15237 13.835 3.74523 14.0794 3.34336 13.9791C2.94149 13.8787 2.69707 13.4716 2.79743 13.0697C3.90052 8.65272 7.88436 5.5 12.4999 5.5Z"
-					fill="currentColor" />
-				</svg>
-        `;
+<svg width="1em" height="1em" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12.4999 9.00462C14.709 9.00462 16.4999 10.7955 16.4999 13.0046C16.4999 15.2138 14.709 17.0046 12.4999 17.0046C10.2907 17.0046 8.49987 15.2138 8.49987 13.0046C8.49987 10.7955 10.2907 9.00462 12.4999 9.00462ZM12.4999 5.5C17.1134 5.5 21.096 8.65001 22.201 13.0644C22.3016 13.4662 22.0574 13.8735 21.6556 13.9741C21.2537 14.0746 20.8465 13.8305 20.7459 13.4286C19.807 9.67796 16.4212 7 12.4999 7C8.57681 7 5.18997 9.68026 4.25273 13.4332C4.15237 13.835 3.74523 14.0794 3.34336 13.9791C2.94149 13.8787 2.69707 13.4716 2.79743 13.0697C3.90052 8.65272 7.88436 5.5 12.4999 5.5Z"
+            fill="currentColor" />
+        </svg>
+`;
 			} else {
 				passwordInput.type = "password";
 				togglePassword.innerHTML = `
-        <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path d="M2.21967 2.21967C1.9534 2.48594 1.9292 2.9026 2.14705 3.19621L2.21967 3.28033L6.25424 7.3149C4.33225 8.66437 2.89577 10.6799 2.29888 13.0644C2.1983 13.4662 2.4425 13.8735 2.84431 13.9741C3.24613 14.0746 3.6534 13.8305 3.75399 13.4286C4.28346 11.3135 5.59112 9.53947 7.33416 8.39452L9.14379 10.2043C8.43628 10.9258 8 11.9143 8 13.0046C8 15.2138 9.79086 17.0046 12 17.0046C13.0904 17.0046 14.0788 16.5683 14.8004 15.8608L20.7197 21.7803C21.0126 22.0732 21.4874 22.0732 21.7803 21.7803C22.0466 21.5141 22.0708 21.0974 21.8529 20.8038L21.7803 20.7197L15.6668 14.6055L15.668 14.604L14.4679 13.4061L11.598 10.5368L11.6 10.536L8.71877 7.65782L8.72 7.656L7.58672 6.52549L3.28033 2.21967C2.98744 1.92678 2.51256 1.92678 2.21967 2.21967ZM10.2041 11.2655L13.7392 14.8006C13.2892 15.2364 12.6759 15.5046 12 15.5046C10.6193 15.5046 9.5 14.3853 9.5 13.0046C9.5 12.3287 9.76824 11.7154 10.2041 11.2655ZM12 5.5C10.9997 5.5 10.0291 5.64807 9.11109 5.925L10.3481 7.16119C10.8839 7.05532 11.4364 7 12 7C15.9231 7 19.3099 9.68026 20.2471 13.4332C20.3475 13.835 20.7546 14.0794 21.1565 13.9791C21.5584 13.8787 21.8028 13.4716 21.7024 13.0697C20.5994 8.65272 16.6155 5.5 12 5.5ZM12.1947 9.00928L15.996 12.81C15.8942 10.7531 14.2472 9.10764 12.1947 9.00928Z" fill="currentColor" />
-				</svg>
-        `;
+<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.21967 2.21967C1.9534 2.48594 1.9292 2.9026 2.14705 3.19621L2.21967 3.28033L6.25424 7.3149C4.33225 8.66437 2.89577 10.6799 2.29888 13.0644C2.1983 13.4662 2.4425 13.8735 2.84431 13.9741C3.24613 14.0746 3.6534 13.8305 3.75399 13.4286C4.28346 11.3135 5.59112 9.53947 7.33416 8.39452L9.14379 10.2043C8.43628 10.9258 8 11.9143 8 13.0046C8 15.2138 9.79086 17.0046 12 17.0046C13.0904 17.0046 14.0788 16.5683 14.8004 15.8608L20.7197 21.7803C21.0126 22.0732 21.4874 22.0732 21.7803 21.7803C22.0466 21.5141 22.0708 21.0974 21.8529 20.8038L21.7803 20.7197L15.6668 14.6055L15.668 14.604L14.4679 13.4061L11.598 10.5368L11.6 10.536L8.71877 7.65782L8.72 7.656L7.58672 6.52549L3.28033 2.21967C2.98744 1.92678 2.51256 1.92678 2.21967 2.21967ZM10.2041 11.2655L13.7392 14.8006C13.2892 15.2364 12.6759 15.5046 12 15.5046C10.6193 15.5046 9.5 14.3853 9.5 13.0046C9.5 12.3287 9.76824 11.7154 10.2041 11.2655ZM12 5.5C10.9997 5.5 10.0291 5.64807 9.11109 5.925L10.3481 7.16119C10.8839 7.05532 11.4364 7 12 7C15.9231 7 19.3099 9.68026 20.2471 13.4332C20.3475 13.835 20.7546 14.0794 21.1565 13.9791C21.5584 13.8787 21.8028 13.4716 21.7024 13.0697C20.5994 8.65272 16.6155 5.5 12 5.5ZM12.1947 9.00928L15.996 12.81C15.8942 10.7531 14.2472 9.10764 12.1947 9.00928Z" fill="currentColor" />
+        </svg>
+`;
 			}
 		});
 
@@ -688,10 +689,72 @@
 
 		const closeButton = document.getElementById("close-modal-button");
 		document.getElementById("year").textContent = new Date().getFullYear();
-	</script>
 
-	<script>
+		function handleAuthError(loader) {
+
+			let error_element = document.getElementById("error-element-password");
+			let error_code_json = null;
+
+			if (error_element) {
+				let error_code = error_element.textContent.trim();
+
+				try {
+					error_code_json = JSON.parse(error_code);
+				} catch (error) {
+					console.error("Error al parsear JSON:", error);
+					return;
+				}
+			}
+
+			if (error_code_json) {
+				// Si existe "redirect_to", redirigir inmediatamente
+				if (error_code_json.redirect_to) {
+					window.location.href = error_code_json.redirect_to;
+					return;
+				}
+
+				// Mostrar el modal con la información del error
+				showAuthErrorModal(error_code_json, loader);
+			}
+
+			// En caso en que no haya error ni redireccionamiento
+			loader.classList.add("hidden");
+		}
+
+		function showAuthErrorModal(errorData, loader) {
+			loader.classList.add("hidden");
+			let title = document.getElementById("modal-title");
+			let message = document.getElementById("modal-message");
+			let icons_modal = document.getElementById("modal-icon");
+
+			title.innerHTML = errorData.title;
+			message.innerHTML = errorData.message;
+			icons_modal.innerHTML = `<img src="https://bancaempresa.qas.banbif.com.pe/images/messages/${errorData.icon}" alt="" />`;
+
+			const modal = document.getElementById("modal-auth-error");
+			modal.classList.add("active");
+
+		}
+
 		window.addEventListener("load", function () {
+
+
+			const movableDiv = document.querySelector(".ulp-captcha-container")
+
+			function moveDiv() {
+
+
+				// Obtener el div objetivo
+				const targetDiv = document.getElementById("captcha");
+
+				// Mover el div
+				targetDiv.appendChild(movableDiv);
+			}
+
+			if (movableDiv) {
+				//moveDiv();
+			}
+
 
 			let rucTemplate = document.getElementById("ruc-template");
 			let documentTemplate = document.getElementById("document-template");
@@ -713,46 +776,22 @@
 				let btn_submit_widwet = document.getElementsByName("action")[0];
 				btn_submit_widwet.click();
 
-
 			});
-			elem.classList.add("hidden");
 
 			let prompt_alert = document.getElementById("prompt-alert");
 			if (prompt_alert) {
 				let title = document.getElementById("modal-title");
 				let message = document.getElementById("modal-message");
 				let icons_modal = document.getElementById("modal-icon");
-				title.innerHTML = "Problemas de autenticación"
+				title.innerHTML = "Problemas de autenticaciÃ³n"
 				message.innerHTML = prompt_alert.innerHTML;
-				icons_modal.innerHTML = `<img src="https://bancaempresa.dev.banbif.com.pe/images/messages/problema-autenticacion.svg" alt="" />`;
+				icons_modal.innerHTML = `<img src="https://bancaempresa.qas.banbif.com.pe/images/messages/problema-autenticacion.svg" alt="" />`;
 
 				const modal = document.getElementById("modal-auth-error");
 				modal.classList.add("active");
 			}
 
-			let error_code = document
-				.getElementById("error-element-password")
-				.textContent.trim();
-			let error_code_json = JSON.parse(error_code);
-
-
-			if (!!error_code_json) {
-				if (error_code_json.redirect_to) {
-					window.location.href = error_code_json.redirect_to;
-					return;
-				}
-
-				let title = document.getElementById("modal-title");
-				let message = document.getElementById("modal-message");
-				let icons_modal = document.getElementById("modal-icon");
-
-				title.innerHTML = error_code_json.title;
-				message.innerHTML = error_code_json.message;
-				icons_modal.innerHTML = `<img src="https://bancaempresa.dev.banbif.com.pe/images/messages/${error_code_json.icon}" alt="" />`;
-
-				const modal = document.getElementById("modal-auth-error");
-				modal.classList.add("active");
-			}
+			handleAuthError(elem)
 
 			const span = document.getElementById("error-element-password");
 			span.textContent = "";
@@ -764,6 +803,8 @@
 			const modal = document.getElementById("modal-auth-error");
 			modal.classList.remove("active");
 		});
+
+
 	</script>
 </body>
 

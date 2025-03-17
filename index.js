@@ -22,18 +22,16 @@ require("dotenv").config();
 })();
 
 
-
 async function templateManager(action, customizeNewUniversalLoginPages) {
-	console.log("entroo");
 	switch (action) {
-
 		case "update":
+			console.log("update")
 			let newTemplate = await fs.readFile("./template.html", "utf-8");
 			customizeNewUniversalLoginPages.updateTemplate(newTemplate);
 			break;
 
 		case "download":
-
+			console.log("download")
 			let oldTemplate = await customizeNewUniversalLoginPages.retrieveTemplate();
 			let date = mostrarFecha()
 			customizeNewUniversalLoginPages.saveTemplate(oldTemplate, `template.html`);
