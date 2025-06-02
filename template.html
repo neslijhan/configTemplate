@@ -11,7 +11,7 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" href="https://bancaempresa.dev.banbif.com.pe/favicon.ico" sizes="any" />
-	<link rel="icon" href="https://bancaempresa.dev.banbif.com.pe/favicon.svg" type="image/svg+xml" />
+	<link rel="icon" type="image/png" href="https://bancaempresa.dev.banbif.com.pe/favicon.png">
 	<link rel="apple-touch-icon" href="https://bancaempresa.dev.banbif.com.pe/apple-touch-icon.png" />
 	<link rel="manifest" href="https://bancaempresa.dev.banbif.com.pe/site.webmanifest" />
 	<link rel="stylesheet" href="https://bancaempresa.dev.banbif.com.pe/styles.css" />
@@ -117,6 +117,10 @@
 
 		.widget-login {
 			display: none;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			z-index: 100;
 		}
 
 		.input-login.error .input__control,
@@ -160,6 +164,30 @@
 			display: none;
 			/* Initially hidden */
 		}
+
+		#counter-text {
+			font-size: 12px;
+			color: #666;
+			margin-top: 8px;
+			text-align: center;
+		}
+
+		#counter {
+			font-weight: bold;
+			color: #666;
+		}
+
+		.checkbox__control {
+			border: 2px solid #A87BF7 !important;
+		}
+
+		#captcha {
+			
+			position: absolute;
+			top: 0px;
+			left: 0px;
+		}
+
 	</style>
 
 
@@ -226,7 +254,7 @@
 					</span>
 					<input class="input__control error" id="document-template" type="text" placeholder=" "
 						autocomplete="off" required />
-					<span class="input__placeholder">Documento de identidad o usuario</span>
+					<span class="input__placeholder">Documento de identidad o Usuario</span>
 					<div class="input__helper-text error display-none" id="document-span-error">
 						<span class="icon">
 							<svg width="1em" height="1em" viewBox="0 0 64 64" fill="none"
@@ -251,7 +279,7 @@
 							</label>
 						</div>
 						<label class="checkbox__content" for="cb-doc">
-							<span class="paragraph font-size-2xs">Recordar documento</span>
+							<span class="paragraph font-size-2xs">Recordar mis documentos</span>
 						</label>
 					</div>
 				</div>
@@ -267,7 +295,7 @@
 					</span>
 					<input class="input__control" id="password-template" type="password" placeholder=" " maxlength="20"
 						autocomplete="new-password" required />
-					<span class="input__placeholder">Clave digital</span>
+					<span class="input__placeholder">Clave Digital o Contraseña</span>
 					<span class="input__icon password" id="password-toggle">
 						<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none"
 							xmlns="http://www.w3.org/2000/svg">
@@ -288,7 +316,9 @@
 				</label>
 
 				<div class="mt-spacing-md mb-spacing-2xl text-align-right">
-					<a href="https://bancaporinternetuat.dombif.peru/DCIBS_REB_BIFNET/pages/s/recuperaclave.jsp?init=0 ">Recuperar clave</a>
+					<a
+						href="https://bancaporinternetuat.dombif.peru/DCIBS_REB_BIFNET/pages/s/recuperaclave.jsp?init=0 ">Recuperar
+						mi contraseña</a>
 				</div>
 
 				<button class="button button--variant-primary button--size-md button--fill-content" type="submit"
@@ -301,7 +331,7 @@
 				</div>
 
 				<div class="mt-spacing-3xl text-align-center">
-					<a href="https://bancaempresa.dev.banbif.com.pe/qr.html">Registrarme en la banca digital</a>
+					<a href="https://bancaempresa.dev.banbif.com.pe/qr.html">Regístrate en la Banca Digital Empresas</a>
 				</div>
 			</form>
 
@@ -375,7 +405,7 @@
 				</svg>
 			</div>
 			<p class="font-text-lg-bold mt-spacing-md color-neutral-light06">
-				Validando token...
+				Estamos validando tu Token Digital
 			</p>
 		</div>
 	</div>
@@ -385,8 +415,8 @@
 
 	<script>
 		const errorMessage = document.getElementById("error-element-code");
-		// const origen = "https://bancaempresa.dev.banbif.com.pe/";
-		const origen = "http://localhost:4200/";
+		const origen = "https://bancaempresa.dev.banbif.com.pe/";
+
 		const path = "{{transaction.params.ext-target}}";
 		if (errorMessage) {
 			window.location.href = `${origen}${path}?rpt=1`;
@@ -419,15 +449,17 @@
 			<div class="modal__content">
 				<div class="pt-spacing-xl"></div>
 				<div class=" modal__head text-align-center mt-spacing-3xl">
-					<img src="https://bancaempresa.dev.banbif.com.pe/images/messages/valida-ingreso.svg" alt="">
+					<img src="https://bancaempresa.dev.banbif.com.pe/images/messages/valida-ingresov2.svg" alt="">
 				</div>
 				<h4 class="font-title-sm-semibold mb-spacing-xl text-align-center">
 					Valida tu ingreso
 				</h4>
 				<div class="row mb-spacing-2xl">
 					<div class="col font-text-md-regular color-neutral-light02 text-align-center">
-						<p>Hemos enviando una notificación a tu celular </p>
-						<p>registrado para que apruebes tu ingreso.</p>
+						<p>Te enviamos una notificación al celular registrado <br> para que apruebes el ingreso.</p>
+						<!-- <p>Hemos enviando una notificación a tu celular </p>
+						<p>registrado para que apruebes tu ingreso.</p> -->
+						<span id="counter-pushnoti" class="widget-login"></span>
 					</div>
 				</div>
 				<button
@@ -443,21 +475,61 @@
 	<div class="widget-login">{%- auth0:widget -%}</div>
 	<script>
 		window.addEventListener("load", function () {
-
+			startCounter();
 			let btn_submit = document.getElementById("btn-submit-push");
 			btn_submit.addEventListener("click", (event) => {
 				event.preventDefault();
 				let btn_submit_widwet = document.getElementsByName("action")[3];
 				btn_submit_widwet.click();
+				console.log('enviando push')
 			});
+			let timeleft = 60;
+			let pushCounter = document.getElementById("counter-pushnoti");
+			pushCounter.innerText = timeleft
+			let activeInterval = false
 
+			const path = "cerrar-sesion";
+			const protocol = window.location.protocol;
+			const currentUrl = window.location.host;
+			const ambientes = [
+				{ origen: ".dev.", destino: "bancaempresa.dev.banbif.com.pe" },
+				{ origen: ".qas.", destino: "bancaempresa.qas.banbif.com.pe" }
+			];
+
+			let destino = ambientes.find(env => currentUrl.includes(env.origen))?.destino || "bancaempresa.banbif.com.pe";
+
+			// Ocultar pushCounter si estamos en producción
+			if (destino === "bancaempresa.banbif.com.pe") {
+				pushCounter.style.display = "none";
+			}
+			function startCounter() {
+				if (!this.activeInterval) {
+					const interval = setInterval(() => {
+						timeleft--;
+						if (timeleft < 1) {
+							const baseUrl = `${protocol}//${destino}/${path}`;
+							console.log(`${destino}${path}`)
+							//debugger;
+							//window.location.href = `${origen}${path}`
+							console.log(baseUrl)
+							clearInterval(interval);
+							window.location.href = baseUrl;
+						} else {
+
+							pushCounter.innerText = timeleft
+						}
+					}, 1000)
+					this.temporizadorActivo = true;
+				} else {
+					//para otras lógicas
+				}
+			}
 		});
 	</script>
 
 	{% else %} {%- auth0:widget -%} {% endif %}
 
 	<script>
-		var environment = "http://localhost:4200/"
 
 		function toggleStyleSheet(index) {
 			const styleSheet = document.styleSheets.item(index);
@@ -496,169 +568,188 @@
 			inputElement.value = inputElement.value.replace(forbiddenCharsRegex, '');
 		}
 
-		rucInput.addEventListener("keydown", function (event) {
+		if (rucInput) {
+			rucInput.addEventListener("keydown", function (event) {
 
-			// Teclas permitidas
-			const allowedKeys = [
-				"Backspace",
-				"Delete",
-				"Tab",
-				"ArrowLeft",
-				"ArrowRight",
-			];
+				// Teclas permitidas
+				const allowedKeys = [
+					"Backspace",
+					"Delete",
+					"Tab",
+					"ArrowLeft",
+					"ArrowRight",
+				];
 
-			// Combinaciones de teclas Ctrl o Cmd permitidas
-			const ctrlAllowedKeys = ["a", "c", "x", "v"];
+				// Combinaciones de teclas Ctrl o Cmd permitidas
+				const ctrlAllowedKeys = ["a", "c", "x", "v"];
 
-			// Permitir teclas de control y navegaciÃ³n
-			if (
-				(event.ctrlKey || event.metaKey) &&
-				ctrlAllowedKeys.includes(event.key.toLowerCase())
-			) {
-				return;
-			}
+				// Permitir teclas de control y navegaciÃ³n
+				if (
+					(event.ctrlKey || event.metaKey) &&
+					ctrlAllowedKeys.includes(event.key.toLowerCase())
+				) {
+					return;
+				}
 
-			if (allowedKeys.includes(event.key)) {
-				return;
-			}
+				if (allowedKeys.includes(event.key)) {
+					return;
+				}
 
-			// Permitir solo letras y nÃºmeros
-			const isLetterOrNumber = /^[A-Z0-9]$/i.test(event.key);
-			if (!isLetterOrNumber) {
+				// Permitir solo letras y nÃºmeros
+				const isLetterOrNumber = /^[A-Z0-9]$/i.test(event.key);
+				if (!isLetterOrNumber) {
+					event.preventDefault();
+				}
+			});
+
+
+			rucInput.addEventListener("input", function () {
+				sanitizeInputValue(rucInput);
+				rucInput.value = rucInput.value.toUpperCase();
+				if (rucInput.value.length >= 3 && rucInput.value.length <= 12) {
+					rucValid = true;
+					rucLabel.classList.remove("error");
+					rucError.classList.add("display-none");
+					rucInput.classList.remove("input__control--error");
+					enableSubmitButton();
+				} else {
+					rucValid = false;
+					rucLabel.classList.add("error");
+					rucError.classList.remove("display-none");
+					rucInput.classList.add("input__control--error");
+				}
+			});
+
+			rucInput.addEventListener("paste", function (event) {
 				event.preventDefault();
-			}
-		});
+				let pasteData = (event.clipboardData || window.clipboardData).getData('text').toUpperCase();
+				pasteData = pasteData.replace(/[<>'"=;(){}\[\]\\\/]/g, '');
+				rucInput.value = pasteData;
 
-
-		rucInput.addEventListener("input", function () {
-			sanitizeInputValue(rucInput);
-			rucInput.value = rucInput.value.toUpperCase();
-			if (rucInput.value.length > 5) {
-				rucValid = true;
-				rucLabel.classList.remove("error")
-				rucError.classList.add("display-none");
-				rucInput.classList.remove("input__control--error");
+				rucValid = rucInput.value.length >= 3 && rucInput.value.length <= 12;
 				enableSubmitButton();
-			}
-		});
+			});
 
-		rucInput.addEventListener("paste", function (event) {
-			event.preventDefault();
-			let pasteData = (event.clipboardData || window.clipboardData).getData('text').toUpperCase();
-			pasteData = pasteData.replace(/[<>'"=;(){}\[\]`\\\/]/g, '');
-			rucInput.value = pasteData;
-			rucValid = rucInput.value.length > 5;
-			enableSubmitButton();
-		});
+			rucInput.addEventListener("blur", () => {
+				const value = rucInput.value.trim();
 
-		rucInput.addEventListener("blur", () => {
-			const value = rucInput.value.trim();
-
-			if (value.startsWith('20')) {
-				if (value.length !== 11) {
-					rucLabel.classList.add("error")
+				if (value.length < 3 || value.length > 12) {
+					rucLabel.classList.add("error");
 					rucError.classList.remove("display-none");
 					rucInput.classList.add("input__control--error");
 				} else {
-					rucLabel.classList.remove("error")
+					rucLabel.classList.remove("error");
 					rucError.classList.add("display-none");
 					rucInput.classList.remove("input__control--error");
 				}
-			} else if (value.toUpperCase().startsWith('AUX')) {
-				if (value.length !== 12) {
-					rucLabel.classList.add("error")
-					rucError.classList.remove("display-none");
-					rucInput.classList.add("input__control--error");
+
+				if (value.startsWith('20')) {
+					if (value.length !== 11) {
+						rucLabel.classList.add("error");
+						rucError.classList.remove("display-none");
+						rucInput.classList.add("input__control--error");
+					} else {
+						rucLabel.classList.remove("error");
+						rucError.classList.add("display-none");
+						rucInput.classList.remove("input__control--error");
+					}
+				} else if (value.toUpperCase().startsWith('AUX')) {
+					if (value.length !== 12) {
+						rucLabel.classList.add("error");
+						rucError.classList.remove("display-none");
+						rucInput.classList.add("input__control--error");
+					} else {
+						rucLabel.classList.remove("error");
+						rucError.classList.add("display-none");
+						rucInput.classList.remove("input__control--error");
+					}
+				}
+			});
+
+		}
+
+		if (documentInput) {
+			documentInput.addEventListener("keydown", function (event) {
+				const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight"];
+				const ctrlAllowedKeys = ["a", "c", "x", "v"];
+				let documentValue = documentInput.value;
+
+				if (
+					(event.ctrlKey || event.metaKey) &&
+					ctrlAllowedKeys.includes(event.key.toLowerCase())
+				) {
+					return;
+				}
+
+				if (allowedKeys.includes(event.key)) {
+					return;
+				}
+
+				// if (!/[0-9]/.test(event.key)) {
+				// 	event.preventDefault();
+				// }
+			});
+
+			documentInput.addEventListener("input", function () {
+				sanitizeInputValue(documentInput);
+				if (documentInput.value.length >= 1) {
+					documentValid = true;
+					documentLabel.classList.remove("error");
+					documentError.classList.add("display-none");
+					documentInput.classList.remove("input__control--error");
+					enableSubmitButton();
 				} else {
-					rucLabel.classList.remove("error")
-					rucError.classList.add("display-none");
-					rucInput.classList.remove("input__control--error");
+					documentValid = false;
+					documentLabel.classList.add("error");
+					documentError.classList.remove("display-none");
+					documentInput.classList.add("input__control--error");
 				}
-			} else {
+			});
 
-				if (value.length < 6) {
-
-					rucLabel.classList.add("error")
-					rucError.classList.remove("display-none");
-					rucInput.classList.add("input__control--error");
-
-				}
-
-			}
-		})
-
-		documentInput.addEventListener("keydown", function (event) {
-			const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight"];
-			const ctrlAllowedKeys = ["a", "c", "x", "v"];
-			let documentValue = documentInput.value;
-
-			if (
-				(event.ctrlKey || event.metaKey) &&
-				ctrlAllowedKeys.includes(event.key.toLowerCase())
-			) {
-				return;
-			}
-
-			if (allowedKeys.includes(event.key)) {
-				return;
-			}
-
-			// if (!/[0-9]/.test(event.key)) {
-			// 	event.preventDefault();
-			// }
-		});
-
-		documentInput.addEventListener("input", function () {
-			sanitizeInputValue(documentInput);
-			if (documentInput.value.length > 5) {
-				documentValid = true;
-				documentLabel.classList.remove("error")
-				documentError.classList.add("display-none");
-				documentInput.classList.remove("input__control--error");
+			documentInput.addEventListener("paste", function (event) {
+				event.preventDefault();
+				let pasteData = (event.clipboardData || window.clipboardData).getData('text');
+				pasteData = pasteData.replace(/[<>'"=;(){}\[\]`\\\/]/g, '');
+				documentInput.value = pasteData;
+				documentValid = documentInput.value.length >= 1;
 				enableSubmitButton();
-			}
-		});
+			});
 
-		documentInput.addEventListener("paste", function (event) {
-			event.preventDefault();
-			let pasteData = (event.clipboardData || window.clipboardData).getData('text');
-			pasteData = pasteData.replace(/[<>'"=;(){}\[\]`\\\/]/g, '');
-			documentInput.value = pasteData;
-			documentValid = documentInput.value.length > 5;
-			enableSubmitButton();
-		});
+			documentInput.addEventListener("blur", () => {
+				const value = documentInput.value.trim();
+				if (value.length < 1 || value.length > 15) {
+					documentLabel.classList.add("error")
+					documentError.classList.remove("display-none");
+					documentInput.classList.add("input__control--error");
+				} else {
+					documentLabel.classList.remove("error")
+					documentError.classList.add("display-none");
+					documentInput.classList.remove("input__control--error");
+				}
+			})
 
-		documentInput.addEventListener("blur", () => {
-			const value = documentInput.value.trim();
-			if (value.length < 5 || value.length > 15) {
-				documentLabel.classList.add("error")
-				documentError.classList.remove("display-none");
-				documentInput.classList.add("input__control--error");
-			} else {
-				documentLabel.classList.remove("error")
-				documentError.classList.add("display-none");
-				documentInput.classList.remove("input__control--error");
-			}
-		})
+		}
+		if (passwordInput) {
+			passwordInput.addEventListener("keydown", preventForbiddenChars);
 
-		passwordInput.addEventListener("keydown", preventForbiddenChars);
+			passwordInput.addEventListener("input", function () {
+				sanitizeInputValue(passwordInput);
+				const passwordValue = passwordInput.value;
+				passwordValid = passwordValue.length >= 6 && passwordValue.length <= 20;
+				enableSubmitButton();
+			});
 
-		passwordInput.addEventListener("input", function () {
-			sanitizeInputValue(passwordInput);
-			const passwordValue = passwordInput.value;
-			passwordValid = passwordValue.length >= 6 && passwordValue.length <= 20;
-			enableSubmitButton();
-		});
+			passwordInput.addEventListener("paste", function (event) {
+				event.preventDefault();
+				let pasteData = (event.clipboardData || window.clipboardData).getData('text');
+				pasteData = pasteData.replace(/[<>'"=;(){}\[\]`\\\/]/g, '');
+				passwordInput.value = pasteData;
+				const passwordValue = passwordInput.value;
+				passwordValid = passwordValue.length >= 6 && passwordValue.length <= 20;
+				enableSubmitButton();
+			});
 
-		passwordInput.addEventListener("paste", function (event) {
-			event.preventDefault();
-			let pasteData = (event.clipboardData || window.clipboardData).getData('text');
-			pasteData = pasteData.replace(/[<>'"=;(){}\[\]`\\\/]/g, '');
-			passwordInput.value = pasteData;
-			const passwordValue = passwordInput.value;
-			passwordValid = passwordValue.length >= 6 && passwordValue.length <= 20;
-			enableSubmitButton();
-		});
+		}
 
 		togglePassword.addEventListener("click", function () {
 			if (passwordInput.type === "password") {
@@ -690,10 +781,12 @@
 		const closeButton = document.getElementById("close-modal-button");
 		document.getElementById("year").textContent = new Date().getFullYear();
 
+		let error_code_json = null;
+
 		function handleAuthError(loader) {
 
 			let error_element = document.getElementById("error-element-password");
-			let error_code_json = null;
+
 
 			if (error_element) {
 				let error_code = error_element.textContent.trim();
@@ -729,7 +822,7 @@
 
 			title.innerHTML = errorData.title;
 			message.innerHTML = errorData.message;
-			icons_modal.innerHTML = `<img src="https://bancaempresa.qas.banbif.com.pe/images/messages/${errorData.icon}" alt="" />`;
+			icons_modal.innerHTML = `<img src="https://bancaempresa.dev.banbif.com.pe/images/messages/${errorData.icon}" alt="" />`;
 
 			const modal = document.getElementById("modal-auth-error");
 			modal.classList.add("active");
@@ -739,7 +832,10 @@
 		window.addEventListener("load", function () {
 
 
+
 			const movableDiv = document.querySelector(".ulp-captcha-container")
+			//const movableDiv = document.getElementsByClassName("ulp-captcha-container");
+
 
 			function moveDiv() {
 
@@ -756,6 +852,21 @@
 			}
 
 
+
+			//Definir cuando se solicita la geolocalización
+			let latitude = 0;
+			let longitude = 0;
+
+			navigator.geolocation.getCurrentPosition((position) => {
+
+				latitude = position.coords.latitude;
+				longitude = position.coords.longitude;
+
+			});
+
+
+
+
 			let rucTemplate = document.getElementById("ruc-template");
 			let documentTemplate = document.getElementById("document-template");
 			let passwordTemplate = document.getElementById("password-template");
@@ -764,8 +875,22 @@
 			btn_submit.addEventListener("click", (event) => {
 				event.preventDefault();
 				elem.classList.remove("hidden");
+
 				let ruc_widget = document.getElementById("ruc");
 				ruc_widget.value = rucTemplate.value;
+
+				//TESTING
+				let data = {
+					"userAgent": window.navigator.userAgent,
+					"location": {
+						"latitude": latitude,
+						"longitude": longitude
+					}
+				}
+
+				let metadataWebBrowser = document.getElementById("metadata-web-browser");
+				metadataWebBrowser.value = JSON.stringify(data);
+				//TESTING
 
 				let username_widget = document.getElementById("username");
 				username_widget.value = `${rucTemplate.value}-${documentTemplate.value}`;
@@ -783,9 +908,9 @@
 				let title = document.getElementById("modal-title");
 				let message = document.getElementById("modal-message");
 				let icons_modal = document.getElementById("modal-icon");
-				title.innerHTML = "Problemas de autenticaciÃ³n"
+				title.innerHTML = "Problemas de autenticación"
 				message.innerHTML = prompt_alert.innerHTML;
-				icons_modal.innerHTML = `<img src="https://bancaempresa.qas.banbif.com.pe/images/messages/problema-autenticacion.svg" alt="" />`;
+				icons_modal.innerHTML = `<img src="https://bancaempresa.dev.banbif.com.pe/images/messages/problema-autenticacion.svg" alt="" />`;
 
 				const modal = document.getElementById("modal-auth-error");
 				modal.classList.add("active");
@@ -798,10 +923,19 @@
 		});
 
 		closeButton.addEventListener("click", function (event) {
-			event.preventDefault();
+			//Si error 010
+			if (error_code_json && error_code_json.error_code === "010") {
 
-			const modal = document.getElementById("modal-auth-error");
-			modal.classList.remove("active");
+				document.getElementById("close-modal-button").href = "https://bancaporinternetuat.dombif.peru/DCIBS_REB_BIFNET/pages/s/recuperaclave.jsp?init=0";
+
+			} else {
+
+				event.preventDefault();
+				const modal = document.getElementById("modal-auth-error");
+				modal.classList.remove("active");
+
+			}
+
 		});
 
 

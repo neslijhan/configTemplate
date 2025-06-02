@@ -17,7 +17,7 @@ require("dotenv").config();
 		);
 
 	await customizeNewUniversalLoginPages.requestAccessToken();
-	templateManager("update", customizeNewUniversalLoginPages)
+	templateManager("download", customizeNewUniversalLoginPages)
 
 })();
 
